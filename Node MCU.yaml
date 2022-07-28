@@ -1,0 +1,126 @@
+esphome:
+    name: # muss angepasst werden
+    platform: ESP8266
+    board: nodemcuv2
+  
+  # Enable logging
+  logger:
+  
+  # Enable Home Assistant API
+  api:
+    password: "" # muss angepasst werden
+  ota:
+    password: "" # muss angepasst werden
+  
+  wifi:
+    ssid: "" # muss angepasst werden
+    password: "" # muss angepasst werden
+  
+    # Enable fallback hotspot (captive portal) in case wifi connection fails
+    ap:
+      ssid: "" # muss angepasst werden
+      password: "" # muss angepasst werden
+  
+  captive_portal:
+  
+  
+  binary_sensor:
+    - platform: gpio
+      id: spotify_button
+      pin:
+        number: GPIO14
+        mode: INPUT_PULLUP
+        inverted: True
+      on_multi_click:
+      - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at most 1s
+        - OFF for at least 0.2s
+        then:
+          - homeassistant.service:
+              service: media_player.media_next_track
+              data:
+                entity_id: media_player.buro
+          - logger.log: "double click - next track"
+      - timing:
+        - ON for .5s to 2s
+        - OFF for at least 0.1s
+        then:
+          - script.execute: start_playlist_shuffle
+          - logger.log: "long press - play spotify playlist"
+      - timing:
+        - ON for at most .49s
+        - OFF for at least 0.25s
+        then:
+          - homeassistant.service:
+              service: media_player.media_play_pause
+              data:
+                entity_id: media_player.buro
+          - logger.log: "single click - play/pause"
+          
+   # Kippschalter       
+    - platform: gpio
+      pin: 
+        number: GPIO0
+        mode:
+          input: true
+          pullup: true
+      name: "Lautsprecher Schalter"
+  
+  
+  sensor:
+    - platform: rotary_encoder
+      id: knob_buro
+      pin_a: GPIO5
+      pin_b: GPIO4
+      min_value: -3
+      max_value: 3
+      on_value_range:
+        - above: 2
+          then:
+            - script.execute: volume_up
+        - below: -2
+          then:
+            - script.execute: volume_down
+                
+  script:
+    - id: volume_up
+      then:
+        - homeassistant.service:
+            service: media_player.volume_up
+            data:
+              entity_id: media_player.buro
+        - logger.log: "vol up trigger"
+        - sensor.rotary_encoder.set_value:
+            id: knob_buro
+            value: 0
+    - id: volume_down
+      then:
+        - homeassistant.service:
+            service: media_player.volume_down
+            data:
+              entity_id: media_player.buro
+        - logger.log: "vol down trigger"
+        - sensor.rotary_encoder.set_value:
+            id: knob_buro
+            value: 0
+    - id: start_playlist_shuffle
+      then:
+        - homeassistant.service:
+            service: media_player.play_media
+            data:
+              entity_id: media_player.buro
+              media_content_id: # muss angepasst werden
+              media_content_type: playlist
+        - homeassistant.service:
+            service: media_player.shuffle_set
+            data:
+              entity_id: media_player.buro
+              shuffle: "true"
+        - homeassistant.service:
+            service: media_player.media_next_track
+            data:
+              entity_id: media_player.buro
+  
+#Teil des Codes von: adamaze  https://github.com/adamaze/esphome_volume_knob

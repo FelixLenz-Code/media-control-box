@@ -1,0 +1,20 @@
+alias: Lautsprecher Schalter
+description: ''
+trigger:
+  - type: turned_on
+    platform: device
+    device_id: # muss bearbeitet werden
+    entity_id: binary_sensor.lautsprecher_schalter
+    domain: binary_sensor
+  - type: turned_off
+    platform: device
+    device_id: # muss bearbeitet werden
+    entity_id: binary_sensor.lautsprecher_schalter
+    domain: binary_sensor
+condition: []
+action:
+  - type: toggle
+    device_id: # muss bearbeitet werden
+    entity_id: switch.lautsprecher_buero
+    domain: switch
+mode: single

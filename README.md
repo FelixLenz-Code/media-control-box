@@ -2,7 +2,7 @@
 ## Idee
 Ich möchte physische Kontrolle über einige Smarthome Geräte wie Lautsprecher oder Google Home Minis haben. Dazu greife ich auf ESPhome und NodeMCU Microcontroller zurück!
 
-Alles weitere erkläre ich in diesem Video: 
+Alles weitere erkläre ich in diesem Video: https://youtu.be/4SPAmhmgYoo
 
 ## Umsetzung
 ### Hardware
